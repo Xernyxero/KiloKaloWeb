@@ -62,6 +62,12 @@ form.onsubmit = function(e) {
 
     localStorage.setItem('perfilFitness', JSON.stringify(perfilUsuario));
     mostrarPerfil();
+    
+    // ⚡ LÍNEA NUEVA: Refresca las barras y calorías de la página principal en tiempo real
+    if (typeof window.refreshProgress === 'function') {
+        window.refreshProgress();
+    }
+
     alert('¡Perfil guardado!');
     modalOverlay.classList.remove('active');
 };
