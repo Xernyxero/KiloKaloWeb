@@ -1,5 +1,7 @@
 # FitApp 🍏 — Calculador Nutricional Inteligente & Asistente de Última Comida
 
+> 🚀 **Despliegue en vivo:** ¡Prueba la aplicación ya mismo en [Netlify] (https://tu-app-fitness.netlify.app)!
+
 FitApp es una aplicación web interactiva, moderna y centrada en la privacidad (100% basada en almacenamiento local) diseñada para el control diario de calorías y macronutrientes. 
 
 El proyecto destaca no solo por su interfaz limpia y reactiva, sino por la inclusión de un **algoritmo de optimización inversa por tanteo** capaz de recalcular los gramos exactos de los ingredientes de una receta para rellenar de forma perfecta las barras de macronutrientes restantes del día.
