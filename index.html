@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Web Fitness</title>
+    <style>
+        /* Estilos Generales y Navbar */
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f9; color: #333; }
+        .navbar { background-color: #ffffff; display: flex; justify-content: space-between; align-items: center; padding: 10px 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; z-index: 10; }
+        .logo { font-size: 20px; font-weight: bold; }
+        .profile-btn { background: #eeeeee; border: none; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
+        .profile-btn:hover { background-color: #dcdcdc; }
+        .profile-icon { width: 32px; height: 32px; fill: #333333; pointer-events: none; }
+
+        /* PANEL DE PROGRESO */
+        .progress-panel { max-width: 800px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-around; gap: 20px; }
+        @media (max-width: 600px) { .progress-panel { flex-direction: column; text-align: center; } }
+
+        .circle-progress-wrapper { position: relative; width: 150px; height: 150px; }
+        .circle-bg { fill: none; stroke: rgba(40, 167, 69, 0.15); stroke-width: 12; }
+        .circle-bar { fill: none; stroke: #28a745; stroke-width: 12; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; stroke-dasharray: 440; stroke-dashoffset: 440; transition: stroke-dashoffset 0.3s ease; }
+        .circle-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
+        .circle-text h3 { margin: 0; font-size: 20px; font-weight: bold; }
+        .circle-text p { margin: 2px 0 0; font-size: 11px; color: #777; }
+
+        .macros-progress-wrapper { flex: 1; width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; }
+        .macro-row { display: flex; flex-direction: column; gap: 5px; }
+        .macro-labels { display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; }
+        .macro-track { width: 100%; height: 12px; border-radius: 6px; overflow: hidden; }
+        .macro-fill { height: 100%; width: 0%; border-radius: 6px; transition: width 0.3s ease; }
+        
+        .track-rojo { background-color: rgba(220, 53, 69, 0.15); } .bg-rojo { background-color: #dc3545; }
+        .track-verde { background-color: rgba(40, 167, 69, 0.15); } .bg-verde { background-color: #28a745; }
+        .track-azul { background-color: rgba(0, 123, 255, 0.15); } .bg-azul { background-color: #007bff; }
+
+        /* SECCIÓN PRINCIPAL */
+        .main-content { max-width: 800px; margin: 0 auto 30px; padding: 0 20px; display: flex; flex-direction: column; gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .card h2 { margin-top: 0; font-size: 1.3rem; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #444; }
+
+        /* DESPLEGABLE ACCORDION */
+        .accordion-btn { background-color: #007bff; color: white; width: 100%; padding: 15px; border: none; text-align: left; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .accordion-btn:hover { background-color: #0056b3; }
+        .accordion-arrow { font-size: 12px; transition: transform 0.2s; }
+        .accordion-btn.active .accordion-arrow { transform: rotate(180deg); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; background: white; border-radius: 0 0 8px 8px; }
+        .accordion-content.open { max-height: 1200px; padding-top: 20px; }
+
+        /* Formularios */
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 8px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .tab-btn.active { background: #007bff; color: white; border-color: #007bff; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        
+        .btn-action { background-color: #6c757d; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        .btn-add-final { background-color: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; font-size: 15px; font-weight: bold; cursor: pointer; }
+        .btn-add-final:hover { background-color: #218838; }
+
+        /* Autocompletado */
+        .autocomplete-wrapper { position: relative; }
+        .suggestions-list { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ccc; border-top: none; z-index: 100; max-height: 150px; overflow-y: auto; list-style: none; padding: 0; margin: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none; }
+        .suggestions-list li { padding: 10px; cursor: pointer; }
+        .suggestions-list li:hover { background-color: #f1f1f1; }
+
+        /* Lista de receta en construcción */
+        .receta-builder-box { background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px dashed #007bff; margin-top: 15px; display: none; }
+
+        /* Diario */
+        .comida-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+        .comida-info p { margin: 2px 0; }
+        .comida-macros { font-size: 11px; color: #666; }
+        .btn-delete { background: none; border: none; color: #dc3545; cursor: pointer; font-size: 16px; }
+
+        /* MODAL PERFIL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 9999; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-container { background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 28px; background: none; border: none; cursor: pointer; color: #aaa; }
+        .perfil-guardado { margin-top: 20px; padding: 15px; background-color: #e2f0d9; border-left: 5px solid #28a745; border-radius: 4px; display: none; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">FitApp 🍏</div>
+        <button class="profile-btn" id="openModalBtn" title="Mi Perfil">
+            <svg class="profile-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </button>
+    </nav>
+
+    <section class="progress-panel" id="progressPanel">
+        <div class="circle-progress-wrapper">
+            <svg width="150" height="150"><circle class="circle-bg" cx="75" cy="75" r="70" /><circle class="circle-bar" id="circleCalorias" cx="75" cy="75" r="70" /></svg>
+            <div class="circle-text"><h3 id="txtCaloriasConsumidas">0</h3><p>de <span id="txtCaloriasObjetivo">0</span> kcal</p></div>
+        </div>
+        <div class="macros-progress-wrapper">
+            <div class="macro-row"><div class="macro-labels"><span>Proteínas</span><span id="txtProtProgreso">0g / 0g</span></div><div class="macro-track track-rojo"><div class="macro-fill bg-rojo" id="barProteinas"></div></div></div>
+            <div class="macro-row"><div class="macro-labels"><span>Grasas</span><span id="txtGrasProgreso">0g / 0g</span></div><div class="macro-track track-verde"><div class="macro-fill bg-verde" id="barGrasas"></div></div></div>
+            <div class="macro-row"><div class="macro-labels"><span>Carbohidratos</span><span id="txtCarbProgreso">0g / 0g</span></div><div class="macro-track track-azul"><div class="macro-fill bg-azul" id="barCarbohidratos"></div></div></div>
+        </div>
+    </section>
+
+    <main class="main-content">
+        
+        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <button class="accordion-btn" id="toggleFormBtn">
+                <span>➕ Registrar Comida / Crear Receta</span>
+                <span class="accordion-arrow">▼</span>
+            </button>
+            
+            <div class="accordion-content" id="accordionContent">
+                <div style="padding: 0 20px 20px 20px;">
+                    <div class="tab-buttons">
+    <button class="tab-btn active" id="tabIngredienteBtn" onclick="cambiarTab('ingrediente')">Por Ingrediente</button>
+    <button class="tab-btn" id="tabCompletaBtn" onclick="cambiarTab('completa')">Comida Rápida o Receta Guardada</button>
+</div>
+
+<form id="comidaForm">
+    
+    <div class="form-group">
+        <label id="lblNombre" for="alimentoNombre">Nombre del Ingrediente:</label>
+        <input type="text" id="alimentoNombre" placeholder="Ej: Pechuga de pollo, Arroz integral..." autocomplete="off">
+        <div class="autocomplete-wrapper">
+            <ul class="suggestions-list" id="suggestionsList"></ul>
+        </div>
+    </div>
+
+    <div class="form-group" id="grupoCantidad">
+        <label for="alimentoCantidad">Cantidad consumida (Gramos o ml):</label>
+        <input type="number" id="alimentoCantidad" value="100" min="1">
+    </div>
+
+    <div class="form-group" id="grupoPorciones" style="display: none;">
+        <label for="recetaPorciones" style="color: #007bff; font-weight: bold;">Número de Porciones / Multiplicador:</label>
+        <input type="number" id="recetaPorciones" value="1" min="0.1" step="0.1">
+    </div>
+
+    <div id="contenedorMacros" style="display: block;">
+        <div class="form-row">
+            <div class="form-group"><label for="calorias">Kcal (por 100g):</label><input type="number" id="calorias"></div>
+            <div class="form-group"><label for="proteinas">Proteínas (g):</label><input type="number" id="proteinas" step="0.1"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label for="hidratos">Carbohidratos (g):</label><input type="number" id="hidratos" step="0.1"></div>
+            <div class="form-group"><label for="azucares">Azúcares (g):</label><input type="number" id="azucares" step="0.1"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label for="grasas">Grasas Totales (g):</label><input type="number" id="grasas" step="0.1"></div>
+            <div class="form-group"><label for="saturadas">Saturadas (g):</label><input type="number" id="saturadas" step="0.1"></div>
+        </div>
+    </div>
+
+    <button type="button" id="btnAgregarIngrediente" class="btn-action" style="background-color: #007bff; display: block;">⬇️ Añadir este Ingrediente al Plato</button>
+    <button type="submit" id="btnAgregarDirecto" class="btn-add-final" style="display: none;">Añadir al Diario Directamente</button>
+</form>
+
+                    <div class="receta-builder-box" id="recetaBuilderBox">
+                        <h3 style="margin-top:0; font-size:15px; color:#007bff;">📋 Composición del Plato / Receta</h3>
+                        <ul id="listaTemporalIngredientes" style="font-size:13px; padding-left:20px;"></ul>
+                        
+                        <div style="background:#fff; padding:10px; border-radius:4px; margin-bottom:12px; font-size:12px; color:#555;">
+                            <strong>Totales acumulados del plato:</strong> <span id="resumenMacrosPlato">0 Kcal | P: 0g</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="recetaNombreFinal" style="font-weight:bold; font-size:13px;">Nombre de la Receta Completa:</label>
+                            <input type="text" id="recetaNombreFinal" placeholder="Ej: Mi Almuerzo Favorito, Cena Post-Entreno...">
+                        </div>
+                        <button type="button" onclick="guardarYComerReceta()" class="btn-add-final">💾 Guardar Receta y Añadir al Diario</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <section class="card">
+            <h2>Diario de Hoy (<span id="fechaHoy"></span>)</h2>
+            <div id="listaComidas"></div>
+        </section>
+
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-container">
+            <button class="close-btn" id="closeModalBtn">&times;</button>
+            <h2>Mi Perfil</h2>
+            <form id="perfilForm">
+                <div class="form-group"><label for="edad">Edad (años):</label><input type="number" id="edad" required></div>
+                <div class="form-group">
+                    <label for="sexo">Sexo:</label>
+                    <select id="sexo" required><option value="">Selecciona...</option><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option></select>
+                </div>
+                <div class="form-group"><label for="altura">Altura (cm):</label><input type="number" id="altura" required></div>
+                <div class="form-group"><label for="peso">Peso (kg):</label><input type="number" id="peso" step="0.1" required></div>
+                <div class="form-group">
+                    <label for="actividad">Actividad Semanal:</label>
+                    <select id="actividad" required><option value="Sedentario">Sedentario</option><option value="Ligero">Ligero</option><option value="Moderado">Moderado</option><option value="Intenso">Intenso</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="objetivo">Objetivo Calórico:</label>
+                    <select id="objetivo" required><option value="Perder peso">Perder peso</option><option value="Mantener peso">Mantener peso</option><option value="Ganar peso">Ganar peso</option></select>
+                </div>
+                <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer;">Guardar Perfil</button>
+            </form>
+            <div id="perfilGuardado" class="perfil-guardado">
+                <h3>Datos guardados:</h3>
+                <p><strong>Edad:</strong> <span id="displayEdad"></span> años</p>
+                <p><strong>Sexo:</strong> <span id="displaySexo"></span></p>
+                <p><strong>Altura:</strong> <span id="displayAltura"></span> cm</p>
+                <p><strong>Peso:</strong> <span id="displayPeso"></span> kg</p>
+                <p><strong>Actividad:</strong> <span id="displayActividad"></span></p>
+                <p><strong>Objetivo:</strong> <span id="displayObjetivo"></span></p>
+                <button onclick="borrarPerfil()" style="background-color: #dc3545; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px;">Borrar Datos</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="profile.js"></script>
+    <script src="diario.js"></script>
+    <script src="calculos.js"></script>
+
+</body>
+</html>
