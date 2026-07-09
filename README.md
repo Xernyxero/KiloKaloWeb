@@ -1,6 +1,6 @@
 # FitApp 🍏 — Calculador Nutricional Inteligente & Asistente de Última Comida
 
-> 🚀 **Despliegue en vivo:** ¡Prueba la aplicación ya mismo en [Netlify] (https://tu-app-fitness.netlify.app)!
+> 🚀 **Despliegue en vivo:** ¡Prueba la aplicación ya mismo en [Netlify] (https://kilokalokalc.netlify.app/)!
 
 FitApp es una aplicación web interactiva, moderna y centrada en la privacidad (100% basada en almacenamiento local) diseñada para el control diario de calorías y macronutrientes. 
 
